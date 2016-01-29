@@ -1,0 +1,172 @@
+name: "Texutre_LeNet"
+layer {
+  name: "texture"
+  type: "HDF5Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  hdf5_data_param {
+   source: "data/texture_data/train128.txt"
+   batch_size: 100
+  }
+}
+layer {
+  name: "texture"
+  type: "HDF5Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  hdf5_data_param {
+   source: "data/texture_data/test128.txt"
+   batch_size: 100
+  }
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 50
+    kernel_size: 18
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+#layer {
+#  name: "pool1"
+#  type: "Pooling"
+#  bottom: "conv1"
+#  top: "pool1"
+#  pooling_param {
+#    pool: MAX
+#   kernel_size: 2
+#   stride: 2
+#  }
+#}
+layer {
+  name: "sig1"
+  type: "Sigmoid"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "conv1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 96
+    kernel_size: 4
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std:0.01
+    }
+    bias_filler {
+      type: "constant"
+      value:1
+    }
+  }
+}
+#layer {
+#  name: "pool2"
+#  type: "Pooling"
+#  bottom: "conv2"
+#  top: "pool2"
+#  pooling_param {
+#    pool: MAX
+#    kernel_size: 3
+#    stride: 2
+#  }
+#}
+layer {
+  name: "sig2"
+  type: "Sigmoid"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "conv2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 5
+    stride: 2
+    weight_filler {
+      type: "gaussian"
+      std:0.01
+    }
+    bias_filler {
+      type: "constant"
+      value:1
+    }
+  }
+}
+layer {
+  name: "fc2"
+  type: "InnerProduct"
+  bottom: "conv3"
+  top: "fc2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 16384
+    weight_filler {
+      type: "gaussian"
+      std:0.01
+    }
+    bias_filler {
+      type: "constant"
+      value:1
+    }
+  }
+}
+layer {
+  name: "sig4"
+  type: "Sigmoid"
+  bottom: "fc2"
+  top: "fc2"
+}
+layer {
+  name: "loss"
+  type: "EuclideanLoss"
+  bottom: "fc2"
+  bottom: "label"
+  top: "loss"
+}
